@@ -12,7 +12,7 @@ using SM.Data;
 namespace SM.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240408094345_initial")]
+    [Migration("20240408185543_initial")]
     partial class initial
     {
         /// <inheritdoc />
