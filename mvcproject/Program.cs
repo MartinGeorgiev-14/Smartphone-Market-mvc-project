@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SM.Common;
 using SM.Data;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,7 +48,7 @@ using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     //Declaring roles
-    var roles = new[] { "Admin", "Member" };
+    var roles = new[] { RoleConstants.Admin.ToString(), RoleConstants.Member.ToString() };
 
     foreach (var role in roles)
     {   //Checks if roles exist
@@ -70,7 +72,7 @@ using (var scope = app.Services.CreateScope())
         //creates user
         await userManager.CreateAsync(user, password);
         //setts role
-        await userManager.AddToRoleAsync(user, "Admin");
+        await userManager.AddToRoleAsync(user, RoleConstants.Admin.ToString());
     }
 }
 

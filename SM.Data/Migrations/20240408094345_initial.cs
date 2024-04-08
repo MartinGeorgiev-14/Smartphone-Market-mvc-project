@@ -63,18 +63,6 @@ namespace SM.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Category",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Category", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "OrderStatus",
                 columns: table => new
                 {
@@ -207,7 +195,7 @@ namespace SM.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PShoe",
+                name: "Smartphone",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -218,22 +206,15 @@ namespace SM.Data.Migrations
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ImageTumbnailImg = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     InStock = table.Column<int>(type: "int", nullable: false),
-                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     BrandId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PShoe", x => x.Id);
+                    table.PrimaryKey("PK_Smartphone", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PShoe_Brand_BrandId",
+                        name: "FK_Smartphone_Brand_BrandId",
                         column: x => x.BrandId,
                         principalTable: "Brand",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PShoe_Category_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Category",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -273,15 +254,15 @@ namespace SM.Data.Migrations
                 {
                     table.PrimaryKey("PK_CartDetail", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CartDetail_PShoe_PShoeId",
-                        column: x => x.PShoeId,
-                        principalTable: "PShoe",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_CartDetail_ShoppingCart_ShoppingCartId",
                         column: x => x.ShoppingCartId,
                         principalTable: "ShoppingCart",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CartDetail_Smartphone_PShoeId",
+                        column: x => x.PShoeId,
+                        principalTable: "Smartphone",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -306,9 +287,9 @@ namespace SM.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderDetail_PShoe_PShoeId",
+                        name: "FK_OrderDetail_Smartphone_PShoeId",
                         column: x => x.PShoeId,
-                        principalTable: "PShoe",
+                        principalTable: "Smartphone",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -378,14 +359,9 @@ namespace SM.Data.Migrations
                 column: "PShoeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PShoe_BrandId",
-                table: "PShoe",
+                name: "IX_Smartphone_BrandId",
+                table: "Smartphone",
                 column: "BrandId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PShoe_CategoryId",
-                table: "PShoe",
-                column: "CategoryId");
         }
 
         /// <inheritdoc />
@@ -425,16 +401,13 @@ namespace SM.Data.Migrations
                 name: "Order");
 
             migrationBuilder.DropTable(
-                name: "PShoe");
+                name: "Smartphone");
 
             migrationBuilder.DropTable(
                 name: "OrderStatus");
 
             migrationBuilder.DropTable(
                 name: "Brand");
-
-            migrationBuilder.DropTable(
-                name: "Category");
         }
     }
 }

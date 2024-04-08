@@ -12,7 +12,7 @@ using SM.Data;
 namespace SM.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240329190737_initial")]
+    [Migration("20240408094345_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -269,21 +269,6 @@ namespace SM.Data.Migrations
                     b.ToTable("CartDetail");
                 });
 
-            modelBuilder.Entity("SM.Data.Models.Models.Category", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Category");
-                });
-
             modelBuilder.Entity("SM.Data.Models.Models.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -356,16 +341,31 @@ namespace SM.Data.Migrations
                     b.ToTable("OrderStatus");
                 });
 
-            modelBuilder.Entity("SM.Data.Models.Models.PShoe", b =>
+            modelBuilder.Entity("SM.Data.Models.Models.ShoppingCart", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ShoppingCart");
+                });
+
+            modelBuilder.Entity("SM.Data.Models.Models.Smartphone", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("BrandId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImageTumbnailImg")
@@ -398,27 +398,7 @@ namespace SM.Data.Migrations
 
                     b.HasIndex("BrandId");
 
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("PShoe");
-                });
-
-            modelBuilder.Entity("SM.Data.Models.Models.ShoppingCart", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ShoppingCart");
+                    b.ToTable("Smartphone");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -474,7 +454,7 @@ namespace SM.Data.Migrations
 
             modelBuilder.Entity("SM.Data.Models.Models.CartDetail", b =>
                 {
-                    b.HasOne("SM.Data.Models.Models.PShoe", "PShoe")
+                    b.HasOne("SM.Data.Models.Models.Smartphone", "PShoe")
                         .WithMany("CartDetail")
                         .HasForeignKey("PShoeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -510,7 +490,7 @@ namespace SM.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SM.Data.Models.Models.PShoe", "PShoe")
+                    b.HasOne("SM.Data.Models.Models.Smartphone", "PShoe")
                         .WithMany("OrderDetail")
                         .HasForeignKey("PShoeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -521,7 +501,7 @@ namespace SM.Data.Migrations
                     b.Navigation("PShoe");
                 });
 
-            modelBuilder.Entity("SM.Data.Models.Models.PShoe", b =>
+            modelBuilder.Entity("SM.Data.Models.Models.Smartphone", b =>
                 {
                     b.HasOne("SM.Data.Models.Models.Brand", "Brand")
                         .WithMany("PShoes")
@@ -529,23 +509,10 @@ namespace SM.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SM.Data.Models.Models.Category", "Category")
-                        .WithMany("PShoes")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Brand");
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("SM.Data.Models.Models.Brand", b =>
-                {
-                    b.Navigation("PShoes");
-                });
-
-            modelBuilder.Entity("SM.Data.Models.Models.Category", b =>
                 {
                     b.Navigation("PShoes");
                 });
@@ -555,16 +522,16 @@ namespace SM.Data.Migrations
                     b.Navigation("OrderDetail");
                 });
 
-            modelBuilder.Entity("SM.Data.Models.Models.PShoe", b =>
+            modelBuilder.Entity("SM.Data.Models.Models.ShoppingCart", b =>
+                {
+                    b.Navigation("CartDetails");
+                });
+
+            modelBuilder.Entity("SM.Data.Models.Models.Smartphone", b =>
                 {
                     b.Navigation("CartDetail");
 
                     b.Navigation("OrderDetail");
-                });
-
-            modelBuilder.Entity("SM.Data.Models.Models.ShoppingCart", b =>
-                {
-                    b.Navigation("CartDetails");
                 });
 #pragma warning restore 612, 618
         }

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SM.Data
+namespace Testings
 {
     public class ApplicationDbContext : IdentityDbContext
     {
@@ -15,8 +15,9 @@ namespace SM.Data
            : base(options)
         { }
 
-        public DbSet<Smartphone> Smartphones { get; set; }
-        public DbSet<Brand> Brands { get; set; }
+        public DbSet<PShoe> PShoe { get; set; }
+        public DbSet<Category> Category { get; set; }
+        public DbSet<Brand> Brand { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<CartDetail> CartDetails { get; set; }
         public DbSet<Order> Orders { get; set; }

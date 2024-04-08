@@ -22,7 +22,7 @@ namespace SM.Data.Models.Models
         [Required]
         public decimal UnitPrice { get; set; }
         public Order Order { get; set; }
-        public PShoe PShoe { get; set; }
+        public Smartphone PShoe { get; set; }
 
 
     }

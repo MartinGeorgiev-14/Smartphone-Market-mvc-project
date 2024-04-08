@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SM.Data.Models.Models
 {
-    [Table("PShoe")]
-    public class PShoe : IBaseModel
+    [Table("Smartphone")]
+    public class Smartphone : IBaseModel
     {
-        public PShoe()
+        public Smartphone()
         {
             this.OrderDetail = new HashSet<OrderDetail>();
             this.CartDetail = new HashSet<CartDetail>();
@@ -30,8 +30,6 @@ namespace SM.Data.Models.Models
         public int InStock { get; set; }
 
         [Required]
-        public Guid CategoryId { get; set; }
-        public virtual Category Category { get; set; }
         public Guid BrandId { get; set; }
         public virtual Brand Brand { get; set; }
         public ICollection<OrderDetail> OrderDetail { get; set; }

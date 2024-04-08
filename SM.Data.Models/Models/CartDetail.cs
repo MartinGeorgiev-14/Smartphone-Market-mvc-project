@@ -22,7 +22,7 @@ namespace SM.Data.Models.Models
         public int Quantity { get; set; }
         [Required]
         public decimal UnitPrice { get; set; }
-        public PShoe PShoe { get; set; }
+        public Smartphone PShoe { get; set; }
         public ShoppingCart ShoppingCart { get; set; }
     }
 }
