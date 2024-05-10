@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using mvcproject.Models;
+using mvcproject.Repositories.Interfaces;
+using SM.Data.Models.DTOs;
+using SM.Data.Models.Models;
 using System.Diagnostics;
 
 namespace mvcproject.Controllers
@@ -7,15 +10,28 @@ namespace mvcproject.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IHomeRepository _homeRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IHomeRepository homeRepository)
         {
-            _logger = logger;
+            this._logger = logger;
+            this._homeRepository = homeRepository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(Guid brandId, string sterm = "")
         {
-            return View();
+
+            IEnumerable<Smartphone> phones = await _homeRepository.GetPhones(brandId, sterm);
+            IEnumerable<Brand> brands = await _homeRepository.Brands();
+            DisplayPhone phoneModel = new DisplayPhone 
+            {
+                Smartphones = phones,
+                Brands = brands,
+                STerm = sterm,
+                BrandId = brandId
+            };
+
+            return View(phoneModel);
         }
 
         public IActionResult Privacy()

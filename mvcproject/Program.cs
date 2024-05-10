@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using mvcproject.Repositories;
+using mvcproject.Repositories.Interfaces;
 using SM.Common;
 using SM.Data;
 
@@ -17,6 +19,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddTransient<IHomeRepository, HomeRepository>();
 
 var app = builder.Build();
 

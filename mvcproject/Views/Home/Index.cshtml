@@ -1,4 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using SM.Data.Models.DTOs
+@using SM.Data.Models.Models
+
+@model DisplayPhone
 
 @inject SignInManager<IdentityUser> SignInMangager
 @inject UserManager<IdentityUser> UserManager
@@ -8,41 +12,52 @@
 }
 
 <div class="my-4">
-    <form class="row row-cols-lg-auto g-3 align-items-center">
+    <form asp-action="Index" class="row row-cols-lg-auto g-3 align-items-center">
 
 
   <div class="col-12">
-    <label class="visually-hidden" for="inlineFormSelectPref">Brand</label>
-    <select class="form-select" id="phoneId">
-      <option selected>Choose...</option>
-      <option value="1">Samsung</option>
-      <option value="2">Huawei</option>
-      <option value="3">Iphone</option>
+    <label class="visually-hidden" for="brandId">Brand</label>
+    <select class="form-select" id="brandId" name="brandId">
+      <option selected>Brand</option>
+                @foreach(var brand in Model.Brands)
+                {
+                    <option selected="@(brand.Id == Model.BrandId)" value="@brand.Id">@brand.Name</option>
+                }
     </select>
   </div>
 
     <div class="col-12">
-    <label class="visually-hidden" for="inlineFormInputGroupUsername">Search by title</label>
+    <label class="visually-hidden" for="sterm">Search by model</label>
     <div class="input-group">
       <div class="input-group-text"></div>
-      <input type="text" class="form-control" id="" placeholder="Search by title">
+      <input type="text" class="form-control" value="@Model.STerm" id="sterm" name="sterm" placeholder="Search by title">
     </div>
   </div>
 
   <div class="col-12">
     <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="/Home/Index" class="btn btn-primary">Reset</a>
   </div>
 </form>
 </div>
 
 <div class="w-100 mt-4 d-flex flex-wrap justify-content-center">
-    @for (int i = 0; i < 9; i++)
+    @foreach (var phone in Model.Smartphones)
     {
         <div class="card mx-2 mb-4" style="width: 16rem;">
-            <img src="https://picsum.photos/120/200" class="card-img-top" alt="...">
+            @if (string.IsNullOrEmpty(phone.ImageTumbnailImg))
+            {
+                <img style="width:100%; height:300px;" src="/images/no-image.png" class="card-img-top" alt="..."/>
+            }
+            else
+            {
+                <img style="width:100%; height:300px;" src="/images/@phone.ImageTumbnailImg" class="card-img-top" alt="...">
+            }
+
             <div class="card-body">
-                <h5 class="card-title">Phone title</h5>
-                <p class="card-text">Price: 1000$ Dimensions: 123cm</p>
+                <h5 class="card-title">@phone.Brand.Name @phone.Name</h5>
+                <p class="card-text">Price: @phone.Price</p>
+                <p class="card-text">Dimensions: @phone.ShortDescription</p>
                 <a href="#" class="btn btn-primary">Add to cart</a>
             </div>
         </div>

@@ -22,9 +22,9 @@ namespace SM.Data.Models.Models
         public string? LongDescription { get; set; }
         [Required]
         public decimal Price { get; set; }
-        [Required]
+        
         public string? ImageUrl { get; set; }
-        [Required]
+ 
         public string? ImageTumbnailImg { get; set; }
         [Required]
         public int InStock { get; set; }
