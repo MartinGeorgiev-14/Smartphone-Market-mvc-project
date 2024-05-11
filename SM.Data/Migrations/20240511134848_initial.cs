@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SM.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class inital : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -246,7 +246,7 @@ namespace SM.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ShoppingCartId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PShoeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SmartphoneId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
@@ -260,8 +260,8 @@ namespace SM.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CartDetail_Smartphone_PShoeId",
-                        column: x => x.PShoeId,
+                        name: "FK_CartDetail_Smartphone_SmartphoneId",
+                        column: x => x.SmartphoneId,
                         principalTable: "Smartphone",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -334,14 +334,14 @@ namespace SM.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CartDetail_PShoeId",
-                table: "CartDetail",
-                column: "PShoeId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_CartDetail_ShoppingCartId",
                 table: "CartDetail",
                 column: "ShoppingCartId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CartDetail_SmartphoneId",
+                table: "CartDetail",
+                column: "SmartphoneId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Order_OrderStatusId",

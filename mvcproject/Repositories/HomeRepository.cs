@@ -39,6 +39,7 @@ namespace mvcproject.Repositories
                                                         Brand = phone.Brand,
                                                         Price = phone.Price,
                                                         ShortDescription = phone.ShortDescription,
+                                                        InStock = phone.InStock,
                                                     }
                           ).ToListAsync();
 

@@ -12,8 +12,8 @@ using SM.Data;
 namespace SM.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240510135825_inital")]
-    partial class inital
+    [Migration("20240511134848_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -248,13 +248,13 @@ namespace SM.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("PShoeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<Guid>("ShoppingCartId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SmartphoneId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("UnitPrice")
@@ -262,9 +262,9 @@ namespace SM.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PShoeId");
-
                     b.HasIndex("ShoppingCartId");
+
+                    b.HasIndex("SmartphoneId");
 
                     b.ToTable("CartDetail");
                 });
@@ -452,21 +452,21 @@ namespace SM.Data.Migrations
 
             modelBuilder.Entity("SM.Data.Models.Models.CartDetail", b =>
                 {
-                    b.HasOne("SM.Data.Models.Models.Smartphone", "PShoe")
-                        .WithMany("CartDetail")
-                        .HasForeignKey("PShoeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("SM.Data.Models.Models.ShoppingCart", "ShoppingCart")
                         .WithMany("CartDetails")
                         .HasForeignKey("ShoppingCartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PShoe");
+                    b.HasOne("SM.Data.Models.Models.Smartphone", "Smartphone")
+                        .WithMany("CartDetail")
+                        .HasForeignKey("SmartphoneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ShoppingCart");
+
+                    b.Navigation("Smartphone");
                 });
 
             modelBuilder.Entity("SM.Data.Models.Models.Order", b =>

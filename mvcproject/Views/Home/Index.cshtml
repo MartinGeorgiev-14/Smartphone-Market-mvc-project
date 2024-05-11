@@ -58,12 +58,34 @@
                 <h5 class="card-title">@phone.Brand.Name @phone.Name</h5>
                 <p class="card-text">Price: @phone.Price</p>
                 <p class="card-text">Dimensions: @phone.ShortDescription</p>
-                <a href="#" class="btn btn-primary">Add to cart</a>
+                <p class="card-text">Stock: @phone.InStock</p>
+                <button type="button" onclick="add(`@phone.Id`)" class="btn btn-primary">Add to cart</button>
             </div>
         </div>
     }
    
 </div>
+
+@section Scripts{
+  <script>
+
+     async function add(phoneId){
+            try {
+                const response = await fetch(`/Cart/AddItem?phoneId=${phoneId}`);
+                if (response.status == 200) {
+                    const result = await response.json();
+                    const cartCountEl = document.getElementById("cartCount");
+                    cartCountEl.innerHTML = result;
+
+                }
+            }
+            catch (err) {
+                console.log(err);
+            }
+      }
+  </script>
+}
+
 
 @if (User.IsInRole("Admin"))
 {
