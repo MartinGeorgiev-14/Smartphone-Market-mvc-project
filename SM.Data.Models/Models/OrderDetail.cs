@@ -25,5 +25,6 @@ namespace SM.Data.Models.Models
         public Smartphone PShoe { get; set; }
 
 
+
     }
 }

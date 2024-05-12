@@ -127,13 +127,13 @@ namespace mvcproject.Repositories
                 throw new Exception("Invalid user");
             }
             var shoppingCart = await _db.ShoppingCarts
-                                .Include(a => a.CartDetails)
-                                .ThenInclude(a => a.Smartphone)
-                                .ThenInclude(a => a.InStock)
-                                .Include(a => a.CartDetails)
-                                .ThenInclude(a => a.Smartphone)
-                                .ThenInclude(a => a.Brand)
-                                .Where(a => a.UserId == userId).FirstOrDefaultAsync();
+                                  .Include(a => a.CartDetails)
+                                  .ThenInclude(a => a.Smartphone)
+                                  .ThenInclude(a => a.Stock)
+                                  .Include(a => a.CartDetails)
+                                  .ThenInclude(a => a.Smartphone)
+                                  .ThenInclude(a => a.Brand)
+                                  .Where(a => a.UserId == userId).FirstOrDefaultAsync();
 
             return shoppingCart;
         }

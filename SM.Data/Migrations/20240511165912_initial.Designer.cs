@@ -12,7 +12,7 @@ using SM.Data;
 namespace SM.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240511134848_initial")]
+    [Migration("20240511165912_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -374,9 +374,6 @@ namespace SM.Data.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("InStock")
-                        .HasColumnType("int");
-
                     b.Property<string>("LongDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -397,6 +394,26 @@ namespace SM.Data.Migrations
                     b.HasIndex("BrandId");
 
                     b.ToTable("Smartphone");
+                });
+
+            modelBuilder.Entity("SM.Data.Models.Models.Stock", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SmartphoneId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SmartphoneId")
+                        .IsUnique();
+
+                    b.ToTable("Stocks");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -510,6 +527,17 @@ namespace SM.Data.Migrations
                     b.Navigation("Brand");
                 });
 
+            modelBuilder.Entity("SM.Data.Models.Models.Stock", b =>
+                {
+                    b.HasOne("SM.Data.Models.Models.Smartphone", "Smartphone")
+                        .WithOne("Stock")
+                        .HasForeignKey("SM.Data.Models.Models.Stock", "SmartphoneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Smartphone");
+                });
+
             modelBuilder.Entity("SM.Data.Models.Models.Brand", b =>
                 {
                     b.Navigation("PShoes");
@@ -530,6 +558,9 @@ namespace SM.Data.Migrations
                     b.Navigation("CartDetail");
 
                     b.Navigation("OrderDetail");
+
+                    b.Navigation("Stock")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

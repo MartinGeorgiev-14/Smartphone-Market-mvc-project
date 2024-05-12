@@ -22,18 +22,22 @@ namespace SM.Data.Models.Models
         public string? LongDescription { get; set; }
         [Required]
         public decimal Price { get; set; }
-        
+
         public string? ImageUrl { get; set; }
- 
+
         public string? ImageTumbnailImg { get; set; }
-        [Required]
-        public int InStock { get; set; }
 
         [Required]
         public Guid BrandId { get; set; }
         public virtual Brand Brand { get; set; }
         public ICollection<OrderDetail> OrderDetail { get; set; }
         public ICollection<CartDetail> CartDetail { get; set; }
+        public Stock Stock { get; set; }
+
+        [NotMapped]
+        public string BrandName { get; set; }
+        [NotMapped]
+        public int Quantity { get; set; }
 
 
     }

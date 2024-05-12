@@ -205,7 +205,6 @@ namespace SM.Data.Migrations
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ImageTumbnailImg = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    InStock = table.Column<int>(type: "int", nullable: false),
                     BrandId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -261,6 +260,25 @@ namespace SM.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_CartDetail_Smartphone_SmartphoneId",
+                        column: x => x.SmartphoneId,
+                        principalTable: "Smartphone",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Stocks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SmartphoneId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Stocks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Stocks_Smartphone_SmartphoneId",
                         column: x => x.SmartphoneId,
                         principalTable: "Smartphone",
                         principalColumn: "Id",
@@ -362,6 +380,12 @@ namespace SM.Data.Migrations
                 name: "IX_Smartphone_BrandId",
                 table: "Smartphone",
                 column: "BrandId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stocks_SmartphoneId",
+                table: "Stocks",
+                column: "SmartphoneId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -387,6 +411,9 @@ namespace SM.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrderDetail");
+
+            migrationBuilder.DropTable(
+                name: "Stocks");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

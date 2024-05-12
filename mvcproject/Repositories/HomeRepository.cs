@@ -26,6 +26,10 @@ namespace mvcproject.Repositories
             IEnumerable<Smartphone> phones = await (from phone in _db.Smartphones
                                                     join brand in _db.Brands
                                                     on phone.BrandId equals brand.Id
+                                                    join stock in _db.Stocks
+                                                    on phone.Id equals stock.SmartphoneId
+                                                    into phone_stocks
+                                                    from phoneWithStocks in phone_stocks.DefaultIfEmpty()
                                                     //If there is no search string it returns all records                  //All records starting with search string will be filtered
                                                     /*------>*/
                                                     where string.IsNullOrWhiteSpace(sTrem) || (phone != null && phone.Name.ToLower().StartsWith(sTrem))
@@ -39,7 +43,7 @@ namespace mvcproject.Repositories
                                                         Brand = phone.Brand,
                                                         Price = phone.Price,
                                                         ShortDescription = phone.ShortDescription,
-                                                        InStock = phone.InStock,
+                                                        Quantity = phoneWithStocks == null ? 0 : phoneWithStocks.Quantity
                                                     }
                           ).ToListAsync();
 

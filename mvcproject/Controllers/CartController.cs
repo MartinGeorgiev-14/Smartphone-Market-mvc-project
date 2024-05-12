@@ -39,7 +39,7 @@ namespace mvcproject.Controllers
             return RedirectToAction("GetUserCart");
         }
 
-        public async Task<IActionResult> GetUserCount()
+        public async Task<IActionResult> GetUserCart()
         {
             var cart = await _cartRepo.GetUserCart();
             return View(cart);
