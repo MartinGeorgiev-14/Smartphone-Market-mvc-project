@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using mvcproject.Repositories.Interfaces;
+using NuGet.Protocol;
+using SM.Common;
 using SM.Data;
 using SM.Data.Models.Models;
 using System.Security.Claims;
@@ -13,12 +15,14 @@ namespace mvcproject.Repositories
         private readonly ApplicationDbContext _db;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly OrderStatusConstants _orderStatusConstants;
 
         public CartRepository(ApplicationDbContext db, UserManager<IdentityUser> userManeger, IHttpContextAccessor httpContextAccessor)
         {
             this._db = db;
             this._userManager = userManeger;
             this._httpContextAccessor = httpContextAccessor;
+            this._orderStatusConstants = new OrderStatusConstants();
         }
 
         public async Task<int> AddItem(Guid phoneId, int quantity)
@@ -151,6 +155,74 @@ namespace mvcproject.Repositories
                               select new { cartDetail.Id }
                               ).ToListAsync();
             return data.Count;
+        }
+
+        public async Task<bool> DoCheckout()
+        {
+            using var transaction = _db.Database.BeginTransaction();
+
+            try 
+            {
+                var userId = GetuserId();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new Exception("User is not logged in");
+                }
+                
+                var cart = await GetCart(userId);
+                if (cart == null)
+                {
+                    throw new Exception("Ivalid cart");
+                }
+
+                var cartDetail = _db.CartDetails
+                                        .Where(a => a.ShoppingCartId == cart.Id).ToList();
+
+                if(cartDetail.Count == 0)
+                {
+                    throw new Exception("Cart is empty");
+                }
+
+                var pendingRecord = _db.OrderStatuses.FirstOrDefault(s => s.StatusName == "Pending");
+                if (pendingRecord is null)
+                    throw new InvalidOperationException("Order status does not have Pending status");
+
+                var order = new Order
+                {
+                    UserId = userId,
+                    CreateDate = DateTime.Now,
+                    OrderStatusId = pendingRecord.Id
+                };
+
+                _db.Orders.Add(order);
+                _db.SaveChanges();
+
+
+                foreach (var item in cartDetail)
+                {
+                    var orderDetail = new OrderDetail
+                    {
+                        SmartphoneId = item.SmartphoneId,
+                        OrderId = order.Id,
+                        Quantity = item.Quantity,
+                        UnitPrice = item.UnitPrice,
+                    };
+                    _db.OrderDetails.Add(orderDetail);
+                }
+                _db.SaveChanges();
+
+                // removing cart details
+                _db.CartDetails.RemoveRange(cartDetail);
+                _db.SaveChanges();
+
+                transaction.Commit();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         private string GetuserId()

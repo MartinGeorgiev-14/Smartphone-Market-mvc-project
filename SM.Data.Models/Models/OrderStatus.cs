@@ -14,10 +14,10 @@ namespace SM.Data.Models.Models
     {
         public Guid Id { get; set; }
 
-        [Required]
-        public Guid StatusId { get; set; }
-
         [Required, MaxLength(20)]
         public string? StatusName { get; set; }
+
+        [NotMapped]
+        public object Smartphone { get; set; }
     }
 }
