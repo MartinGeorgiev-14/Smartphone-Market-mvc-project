@@ -1,4 +1,5 @@
-﻿using SM.Data.Models.Models;
+﻿using SM.Data.Models.DTOs;
+using SM.Data.Models.Models;
 
 namespace mvcproject.Repositories.Interfaces
 {
@@ -9,6 +10,6 @@ namespace mvcproject.Repositories.Interfaces
         Task<ShoppingCart> GetUserCart();
         Task<int> GetCartItemCount(string userId = "");
         Task<ShoppingCart> GetCart(string userId);
-        Task<bool> DoCheckout();
+        Task<bool> DoCheckout(CheckoutModel model);
     }
 }

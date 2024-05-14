@@ -5,6 +5,7 @@ using mvcproject.Repositories.Interfaces;
 using NuGet.Protocol;
 using SM.Common;
 using SM.Data;
+using SM.Data.Models.DTOs;
 using SM.Data.Models.Models;
 using System.Security.Claims;
 
@@ -157,7 +158,7 @@ namespace mvcproject.Repositories
             return data.Count;
         }
 
-        public async Task<bool> DoCheckout()
+        public async Task<bool> DoCheckout(CheckoutModel model)
         {
             using var transaction = _db.Database.BeginTransaction();
 
@@ -184,13 +185,22 @@ namespace mvcproject.Repositories
                 }
 
                 var pendingRecord = _db.OrderStatuses.FirstOrDefault(s => s.StatusName == "Pending");
-                if (pendingRecord is null)
+                if (pendingRecord is null) 
+                {
                     throw new InvalidOperationException("Order status does not have Pending status");
+                }
+
 
                 var order = new Order
                 {
                     UserId = userId,
                     CreateDate = DateTime.Now,
+                    Name = model.Name,
+                    Email = model.Email,
+                    MobileNumber = model.MobileNumber,
+                    PaymentMethod = model.PaymentMethod,
+                    Address = model.Address,
+                    isPaid = false,
                     OrderStatusId = pendingRecord.Id
                 };
 

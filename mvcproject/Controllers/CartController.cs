@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mvcproject.Repositories.Interfaces;
+using SM.Data.Models.DTOs;
 
 namespace mvcproject.Controllers
 {
@@ -51,15 +52,36 @@ namespace mvcproject.Controllers
             return Ok(cartItem);
         }
 
-        public async Task<IActionResult> Checkout()
+        public IActionResult Checkout() { 
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Checkout(CheckoutModel model)
         {
-            bool isCheckedOut = await _cartRepo.DoCheckout();
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            bool isCheckedOut = await _cartRepo.DoCheckout(model);
             if (!isCheckedOut)
             {
-                throw new Exception("Something went wrong");
+                return RedirectToAction(nameof(OrderFail));
             }
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(OrderSuccess));
 
+        }
+
+        public IActionResult OrderSuccess()
+        {
+            return View();
+        }
+
+        public IActionResult OrderFail()
+        {
+            return View();
         }
 
     }

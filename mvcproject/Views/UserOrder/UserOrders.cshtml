@@ -33,16 +33,12 @@
                             <table class="table table-striped">
                                 <tr>
                                     <th>Product</th>
-                                    <th>Model</th>
+                                    <th>Image</th>
                                     <th>Unit Price</th>
-                                    <th>Total Price</th
+                                    <th>Total Price</th>
                                 </tr>
                                 @foreach (var item in order.OrderDetail)
                                 {
-                                    <tr>
-                                        <td>Total: </td>
-                                        <td>@(order.OrderDetail.Select(item => item.Smartphone.Price * item.Quantity).Sum())</td>
-                                    </tr>
                                     <tr>
                                         <td>@item.Smartphone.Brand.Name @item.Smartphone.Name</td>
                                         <td>
