@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 using mvcproject.Repositories.Interfaces;
-using NuGet.Protocol;
 using SM.Common;
 using SM.Data;
 using SM.Data.Models.DTOs;
 using SM.Data.Models.Models;
-using System.Security.Claims;
 
 namespace mvcproject.Repositories
 {
@@ -35,7 +32,7 @@ namespace mvcproject.Repositories
                
                 if (string.IsNullOrEmpty(userId))
                 {
-                    throw new Exception("Invalid userId");
+                    throw new UnauthorizedAccessException("Invalid userId");
                 }
 
                 var cart = await GetCart(userId);
@@ -82,38 +79,25 @@ namespace mvcproject.Repositories
 
         public async Task<int> RemoveItem(Guid phoneId)
         {
+            //using var transaction = _db.Database.BeginTransaction();
             string userId = GetuserId();
-            using var transaction = _db.Database.BeginTransaction();
             try
             {
-               
                 if (string.IsNullOrEmpty(userId))
-                {
-                    throw new Exception("Ivalid userId");
-                }
-
+                    throw new UnauthorizedAccessException("user is not logged-in");
                 var cart = await GetCart(userId);
                 if (cart is null)
-                {
-                    throw new Exception("Cart is empty");
-                }
+                    throw new InvalidOperationException("Invalid cart");
                 // cart detail section
-                var cartItem = _db.CartDetails.FirstOrDefault(c => c.ShoppingCartId == cart.Id && c.SmartphoneId == phoneId);
+                var cartItem = _db.CartDetails
+                                  .FirstOrDefault(a => a.ShoppingCartId == cart.Id && a.SmartphoneId == phoneId);
                 if (cartItem is null)
-                {
-                    throw new Exception("No items in the cart");
-                }
+                    throw new InvalidOperationException("Not items in cart");
                 else if (cartItem.Quantity == 1)
-                {
                     _db.CartDetails.Remove(cartItem);
-                }
                 else
-                {
                     cartItem.Quantity = cartItem.Quantity - 1;
-                }
                 _db.SaveChanges();
-
-               
             }
             catch (Exception ex)
             {
@@ -121,7 +105,6 @@ namespace mvcproject.Repositories
             }
             var cartItemCount = await GetCartItemCount(userId);
             return cartItemCount;
-
         }
 
         public async Task<ShoppingCart> GetUserCart()
@@ -129,7 +112,7 @@ namespace mvcproject.Repositories
             var userId = GetuserId();
             if(userId == null)
             {
-                throw new Exception("Invalid user");
+                throw new UnauthorizedAccessException("Invalid user");
             }
             var shoppingCart = await _db.ShoppingCarts
                                   .Include(a => a.CartDetails)
@@ -161,40 +144,27 @@ namespace mvcproject.Repositories
         public async Task<bool> DoCheckout(CheckoutModel model)
         {
             using var transaction = _db.Database.BeginTransaction();
-
-            try 
+            try
             {
+                // logic
+                // move data from cartDetail to order and order detail then we will remove cart detail
                 var userId = GetuserId();
                 if (string.IsNullOrEmpty(userId))
-                {
-                    throw new Exception("User is not logged in");
-                }
-                
+                    throw new UnauthorizedAccessException("User is not logged-in");
                 var cart = await GetCart(userId);
-                if (cart == null)
-                {
-                    throw new Exception("Ivalid cart");
-                }
-
+                if (cart is null)
+                    throw new InvalidOperationException("Invalid cart");
                 var cartDetail = _db.CartDetails
-                                        .Where(a => a.ShoppingCartId == cart.Id).ToList();
-
-                if(cartDetail.Count == 0)
-                {
-                    throw new Exception("Cart is empty");
-                }
-
+                                    .Where(a => a.ShoppingCartId == cart.Id).ToList();
+                if (cartDetail.Count == 0)
+                    throw new InvalidOperationException("Cart is empty");
                 var pendingRecord = _db.OrderStatuses.FirstOrDefault(s => s.StatusName == "Pending");
-                if (pendingRecord is null) 
-                {
+                if (pendingRecord is null)
                     throw new InvalidOperationException("Order status does not have Pending status");
-                }
-
-
                 var order = new Order
                 {
                     UserId = userId,
-                    CreateDate = DateTime.Now,
+                    CreateDate = DateTime.UtcNow,
                     Name = model.Name,
                     Email = model.Email,
                     MobileNumber = model.MobileNumber,
@@ -203,11 +173,8 @@ namespace mvcproject.Repositories
                     isPaid = false,
                     OrderStatusId = pendingRecord.Id
                 };
-
                 _db.Orders.Add(order);
                 _db.SaveChanges();
-
-
                 foreach (var item in cartDetail)
                 {
                     var orderDetail = new OrderDetail
@@ -215,22 +182,36 @@ namespace mvcproject.Repositories
                         SmartphoneId = item.SmartphoneId,
                         OrderId = order.Id,
                         Quantity = item.Quantity,
-                        UnitPrice = item.UnitPrice,
+                        UnitPrice = item.UnitPrice
                     };
                     _db.OrderDetails.Add(orderDetail);
-                }
-                _db.SaveChanges();
 
-                // removing cart details
+                    // update stock here
+
+                    var stock = await _db.Stocks.FirstOrDefaultAsync(a => a.SmartphoneId == item.SmartphoneId);
+                    if (stock == null)
+                    {
+                        throw new InvalidOperationException("Stock is null");
+                    }
+
+                    if (item.Quantity > stock.Quantity)
+                    {
+                        throw new InvalidOperationException($"Only {stock.Quantity} items(s) are available in the stock");
+                    }
+                    // decrease the number of quantity from the stock table
+                    stock.Quantity -= item.Quantity;
+                }
+                //_db.SaveChanges();
+
+                // removing the cartdetails
                 _db.CartDetails.RemoveRange(cartDetail);
                 _db.SaveChanges();
-
                 transaction.Commit();
-
                 return true;
             }
             catch (Exception ex)
             {
+
                 return false;
             }
         }

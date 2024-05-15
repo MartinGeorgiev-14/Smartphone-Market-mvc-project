@@ -59,7 +59,16 @@
                 <p class="card-text">Price: @phone.Price</p>
                 <p class="card-text">Dimensions: @phone.ShortDescription</p>
                 <p class="card-text">Stock: @phone.Quantity</p>
-                <button type="button" onclick="add(`@phone.Id`)" class="btn btn-primary">Add to cart</button>
+                @if(phone.Quantity > 0)
+                {
+
+                    <button type="button" onclick="add(`@phone.Id`)" class="btn btn-primary">Add to cart</button>
+                }
+                else
+                {
+                    <span style="border: 1px solid; padding: 5px 8px; color:red; border-radius: 5px;" >Out of stock</span>
+                }
+                
             </div>
         </div>
     }
