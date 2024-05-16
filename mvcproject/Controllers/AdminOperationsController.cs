@@ -82,5 +82,10 @@ namespace mvcproject.Controllers
             }
             return RedirectToAction(nameof(UpdateOrderStatus), new { orderId = data.OrderId });
         }
+
+        public IActionResult Dashboard()
+        {
+            return View();
+        }
     }
 }
