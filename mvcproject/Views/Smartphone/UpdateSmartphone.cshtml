@@ -1,0 +1,56 @@
+﻿@using SM.Data.Models.DTOs
+@model SmartphoneDTO
+@{
+
+}
+<div style="width:50%">
+    <h2> Update Book </h2>
+    <a asp-action="Index" asp-controller="Smartphone" class="btn btn-primary">Back</a>
+    <form asp-action="UpdateSmartphone" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Image" />
+
+        <div class="my-2">
+            <label>Brand*</label>
+            <select class="form-control" asp-for="BrandId" asp-items="Model.BrandList">
+                <option value="">Select Genre</option>
+            </select>
+            <span asp-validation-for="BrandId" class="text-danger"></span>
+        </div>
+
+        <div class="my-2">
+            <label>Model*</label>
+            <input type="text" class="form-control" asp-for="SmartphoneName" />
+            <span asp-validation-for="SmartphoneName" class="text-danger"></span>
+        </div>
+
+        <div class="my-2">
+            <label>Price*</label>
+            <input type="number" class="form-control" asp-for="Price" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+
+        <div class="my-2">
+            <label>Image</label>
+            @if(!string.IsNullOrEmpty(Model.Image))
+            {
+                <img src="/images/@Model.Image" style="width:100px;height:80px"/>
+            }
+            <input type="file" class="form-control" asp-for="ImageFile" />
+        </div>
+
+        <div class="my-2">
+            <label>Short Description*</label>
+            <input type="text" class="form-control" asp-for="ShortDescription" />
+        </div>
+
+        <div class="my-2">
+            <label>Long description*</label>
+            <input type="text" class="form-control" asp-for="LongDescription" />
+        </div>
+
+        <div class="my-2">
+            <button type="submit" class="btn btn-info">Update</button>
+        </div>
+    </form>
+</div>

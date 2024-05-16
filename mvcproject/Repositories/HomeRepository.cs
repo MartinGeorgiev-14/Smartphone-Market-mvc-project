@@ -36,8 +36,7 @@ namespace mvcproject.Repositories
                                                     select new Smartphone
                                                     {
                                                         Id = phone.Id,
-                                                        ImageTumbnailImg = phone.ImageTumbnailImg,
-                                                        ImageUrl = phone.ImageUrl,
+                                                        Image = phone.Image,
                                                         Name = phone.Name,
                                                         BrandId = phone.BrandId,
                                                         Brand = phone.Brand,

@@ -1,0 +1,44 @@
+﻿@using SM.Data.Models.Models
+@model IEnumerable<Smartphone>
+@{
+}
+
+<h2>Smartphones</h2>
+
+<a asp-action="AddSmartphone" asp-controller="Smartphone" class="btn btn-primary">Add more</a>
+
+@if(Model?.Count() > 0)
+{
+    <table class="table table-striped my-2">
+        <tr>
+            <th>Image</th>
+            <th>Smartphone</th>
+            <th>Model</th>
+            <th>Price</th>
+            <th>Action</th>
+
+        </tr>
+
+        @foreach(var phone in Model)
+        {
+            <tr>
+                <td>
+                    @if (string.IsNullOrWhiteSpace(phone.Image))
+                    {
+                        <img src="/images/no-image.png" style="width:80px; height:100px;" alt="smartphone image"/>
+                    }
+                    else
+                    {
+                        <img src="/images/@phone.Image" style="width:80px; height:100px;" alt="smartphone image"/>
+                    }
+                </td>
+                <td>@phone.Brand.Name @phone.Name</td>
+                <td>@phone.Price</td>
+                <td>
+                    <a asp-action="UpdateSmartphone" asp-controller="Smartphone" asp-route-id="@phone.Id" class="btn btn-success">Edit</a>
+                    <a asp-action="DeleteSmartphone" asp-controller="Smartphone" asp-route-id="@phone.Id" class="btn btn-danger" onclick="return window.confirm(`Are you sure`)">Delete</a>
+                </td>
+            </tr>
+        }
+    </table>
+}

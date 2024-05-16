@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using mvcproject.Repositories;
 using mvcproject.Repositories.Interfaces;
+using mvcproject.Shared;
 using SM.Common;
 using SM.Data;
 
@@ -26,6 +27,8 @@ builder.Services.AddTransient<ICartRepository, CartRepository>();
 builder.Services.AddTransient<IUserOrderRepository, UserOrderRepository>();
 builder.Services.AddTransient<IStockRepostiory, StockRepostiory>();
 builder.Services.AddTransient<IBrandRepository, BrandRepository>();
+builder.Services.AddTransient<IFileService, FileService>();
+builder.Services.AddTransient<ISmartphoneRepository, SmartphoneRepository>();
 
 var app = builder.Build();
 

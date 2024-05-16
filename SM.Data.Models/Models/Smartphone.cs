@@ -23,9 +23,7 @@ namespace SM.Data.Models.Models
         [Required]
         public decimal Price { get; set; }
 
-        public string? ImageUrl { get; set; }
-
-        public string? ImageTumbnailImg { get; set; }
+        public string? Image { get; set; }
 
         [Required]
         public Guid BrandId { get; set; }

@@ -24,13 +24,13 @@
                 <tr>
                     <td>@item.Smartphone.Brand.Name @item.Smartphone.Name</td>
                     <td>
-                        @if (string.IsNullOrEmpty(item.Smartphone.ImageTumbnailImg))
+                        @if (string.IsNullOrEmpty(item.Smartphone.Image))
                         {
                             <img src="/images/NoImage.png" style="width:80px;height:100px" />
                         }
                         else
                         {
-                            <img src="/images/@item.Smartphone.ImageTumbnailImg" style="width:80px;height:100px" />
+                            <img src="/images/@item.Smartphone.Image" style="width:80px;height:100px" />
                         }
                     </td>
                     <td>@item.Smartphone.Price X @item.Quantity</td>

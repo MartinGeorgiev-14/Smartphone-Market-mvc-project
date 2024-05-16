@@ -45,13 +45,13 @@
     @foreach (var phone in Model.Smartphones)
     {
         <div class="card mx-2 mb-4" style="width: 16rem;">
-            @if (string.IsNullOrEmpty(phone.ImageTumbnailImg))
+            @if (string.IsNullOrEmpty(phone.Image))
             {
                 <img style="width:100%; height:300px;" src="/images/no-image.png" class="card-img-top" alt="..."/>
             }
             else
             {
-                <img style="width:100%; height:300px;" src="/images/@phone.ImageTumbnailImg" class="card-img-top" alt="...">
+                <img style="width:100%; height:300px;" src="/images/@phone.Image" class="card-img-top" alt="...">
             }
 
             <div class="card-body">
@@ -93,13 +93,4 @@
             }
       }
   </script>
-}
-
-
-@if (User.IsInRole("Admin"))
-{
-    <h1>Hi Admin</h1>
-}else
-{
-    
 }
