@@ -25,6 +25,7 @@ builder.Services.AddTransient<IHomeRepository, HomeRepository>();
 builder.Services.AddTransient<ICartRepository, CartRepository>();
 builder.Services.AddTransient<IUserOrderRepository, UserOrderRepository>();
 builder.Services.AddTransient<IStockRepostiory, StockRepostiory>();
+builder.Services.AddTransient<IBrandRepository, BrandRepository>();
 
 var app = builder.Build();
 

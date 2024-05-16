@@ -15,13 +15,13 @@ namespace SM.Data.Models.Models
     {
         public Brand()
         {
-            this.PShoes = new HashSet<Smartphone>();
+            this.Smartphones = new HashSet<Smartphone>();
         }
 
         public Guid Id { get; set; }
 
         [Required]
         public string? Name { get; set; }
-        public ICollection<Smartphone> PShoes { get; set; }
+        public ICollection<Smartphone> Smartphones { get; set; }
     }
 }

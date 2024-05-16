@@ -14,16 +14,15 @@ namespace mvcproject.Controllers
     public class AdminOperationsController : Controller
     {
         private readonly IUserOrderRepository _userOrderRepository;
-
         public AdminOperationsController(IUserOrderRepository userOrderRepository)
         {
-            this._userOrderRepository = userOrderRepository;
+            _userOrderRepository = userOrderRepository;
         }
 
         public async Task<IActionResult> AllOrders()
         {
-            var order = await _userOrderRepository.UserOrders(true);
-            return View(order);
+            var orders = await _userOrderRepository.UserOrders(true);
+            return View(orders);
         }
 
         public async Task<IActionResult> TogglePaymentStatus(Guid orderId)
@@ -34,40 +33,17 @@ namespace mvcproject.Controllers
             }
             catch (Exception ex)
             {
-
+                // log exception here
             }
             return RedirectToAction(nameof(AllOrders));
         }
 
-        public async Task<IActionResult> UpdatePaymentStatus(Guid orderId)
-        {
-            var order = await _userOrderRepository.GetOrderById(orderId);
-            if (order == null)
-            {
-                throw new InvalidOperationException($"Order with id: {orderId} was not found");
-            }
-
-            var orderStatusList = (await _userOrderRepository.GetOrderStatuses()).Select(orderStatus =>
-            {
-                return new SelectListItem { Value = orderStatus.Id.ToString(), Text = orderStatus.StatusName, Selected = order.OrderStatusId == orderStatus.Id };
-            });
-
-            var data = new UpdateOrderStatusModel
-            {
-                Id = orderId,
-                OrderStatusId = order.OrderStatusId,
-                OrderStatusList = orderStatusList
-            };
-            return View(data);
-        }
-
-        [HttpGet]
         public async Task<IActionResult> UpdateOrderStatus(Guid orderId)
         {
             var order = await _userOrderRepository.GetOrderById(orderId);
             if (order == null)
             {
-                throw new InvalidOperationException($"Order with id:{orderId} was not found.");
+                throw new InvalidOperationException($"Order with id:{orderId} does not found.");
             }
             var orderStatusList = (await _userOrderRepository.GetOrderStatuses()).Select(orderStatus =>
             {
@@ -75,7 +51,7 @@ namespace mvcproject.Controllers
             });
             var data = new UpdateOrderStatusModel
             {
-                Id = orderId,
+                OrderId = orderId,
                 OrderStatusId = order.OrderStatusId,
                 OrderStatusList = orderStatusList
             };
@@ -104,7 +80,7 @@ namespace mvcproject.Controllers
                 // catch exception here
                 TempData["msg"] = "Something went wrong";
             }
-            return RedirectToAction(nameof(UpdateOrderStatus), new { orderId = data.OrderStatusId });
+            return RedirectToAction(nameof(UpdateOrderStatus), new { orderId = data.OrderId });
         }
     }
 }

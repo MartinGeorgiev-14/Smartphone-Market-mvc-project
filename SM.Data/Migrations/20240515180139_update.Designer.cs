@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SM.Data;
 
@@ -11,9 +12,11 @@ using SM.Data;
 namespace SM.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240515180139_update")]
+    partial class update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -352,6 +355,9 @@ namespace SM.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int>("StatusNum")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("OrderStatus");
@@ -535,7 +541,7 @@ namespace SM.Data.Migrations
             modelBuilder.Entity("SM.Data.Models.Models.Smartphone", b =>
                 {
                     b.HasOne("SM.Data.Models.Models.Brand", "Brand")
-                        .WithMany("Smartphones")
+                        .WithMany("PShoes")
                         .HasForeignKey("BrandId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -556,7 +562,7 @@ namespace SM.Data.Migrations
 
             modelBuilder.Entity("SM.Data.Models.Models.Brand", b =>
                 {
-                    b.Navigation("Smartphones");
+                    b.Navigation("PShoes");
                 });
 
             modelBuilder.Entity("SM.Data.Models.Models.Order", b =>

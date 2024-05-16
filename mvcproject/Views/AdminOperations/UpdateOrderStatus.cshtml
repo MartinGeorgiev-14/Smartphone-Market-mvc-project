@@ -1,6 +1,8 @@
-﻿@using SM.Data.Models.DTOs
+﻿
 
-@model ﻿UpdateOrderStatusModel
+@using SM.Data.Models.DTOs
+
+@model UpdateOrderStatusModel
 
 @{
     ViewData["Title"] = "UpdatePaymentStatus";
@@ -11,7 +13,7 @@
 
 <form style="width: 50%;" asp-action="UpdateOrderStatus" class="pt-2">
 
-    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="OrderId" />
 
     <div class="mb-2">
         <label>Order status</label>

@@ -9,7 +9,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace mvcproject.Repositories
 {
-    
+
 
     public class UserOrderRepository : IUserOrderRepository
     {
@@ -17,19 +17,22 @@ namespace mvcproject.Repositories
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public UserOrderRepository(ApplicationDbContext db, IHttpContextAccessor contextAccessor, UserManager<IdentityUser> userManager)
+
+        public UserOrderRepository(ApplicationDbContext db,
+            UserManager<IdentityUser> userManager,
+             IHttpContextAccessor httpContextAccessor)
         {
-            this._db = db;
-            this._httpContextAccessor = contextAccessor;
-            this._userManager = userManager;
+            _db = db;
+            _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
 
         public async Task ChangeOrderStatus(UpdateOrderStatusModel data)
         {
-            var order = await _db.Orders.FindAsync(data.Id);
-            if(order == null)
+            var order = await _db.Orders.FindAsync(data.OrderId);
+            if (order == null)
             {
-                throw new InvalidOperationException($"Order with id: {data.Id} was not found");
+                throw new InvalidOperationException($"order withi id:{data.OrderStatusId} does not found");
             }
             order.OrderStatusId = data.OrderStatusId;
             await _db.SaveChangesAsync();
@@ -50,7 +53,7 @@ namespace mvcproject.Repositories
             var order = await _db.Orders.FindAsync(orderId);
             if (order == null)
             {
-                throw new InvalidOperationException($"Order with id: {orderId} was not found");
+                throw new InvalidOperationException($"order withi id:{orderId} does not found");
             }
             order.isPaid = !order.isPaid;
             await _db.SaveChangesAsync();
@@ -59,19 +62,15 @@ namespace mvcproject.Repositories
         public async Task<IEnumerable<Order>> UserOrders(bool getAll = false)
         {
             var orders = _db.Orders
-                            .Include(a => a.OrderStatus)
-                            .Include(a => a.OrderDetail)
-                            .ThenInclude(a => a.Smartphone)
-                            .ThenInclude(a => a.Brand).AsQueryable();
-
-            if(!getAll) 
+                           .Include(x => x.OrderStatus)
+                           .Include(x => x.OrderDetail)
+                           .ThenInclude(x => x.Smartphone)
+                           .ThenInclude(x => x.Brand).AsQueryable();
+            if (!getAll)
             {
-                var userId = GetuserId();
+                var userId = GetUserId();
                 if (string.IsNullOrEmpty(userId))
-                {
-                    throw new Exception("User is not logged in");
-                }
-
+                    throw new Exception("User is not logged-in");
                 orders = orders.Where(a => a.UserId == userId);
                 return await orders.ToListAsync();
             }
@@ -79,10 +78,10 @@ namespace mvcproject.Repositories
             return await orders.ToListAsync();
         }
 
-        private string GetuserId()
+        private string GetUserId()
         {
             var principal = _httpContextAccessor.HttpContext.User;
-            var userId = _userManager.GetUserId(principal);
+            string userId = _userManager.GetUserId(principal);
             return userId;
         }
     }
