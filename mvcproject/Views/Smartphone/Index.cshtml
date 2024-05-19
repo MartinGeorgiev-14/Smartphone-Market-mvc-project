@@ -26,11 +26,11 @@
                 <td>
                     @if (string.IsNullOrWhiteSpace(phone.Image))
                     {
-                        <img src="/images/no-image.png" style="width:80px; height:100px;" alt="smartphone image"/>
+                        <img src="/images/no-image.png" style="width:50%; height:80px;" alt="smartphone image"/>
                     }
                     else
                     {
-                        <img src="/images/@phone.Image" style="width:80px; height:100px;" alt="smartphone image"/>
+                        <img src="/images/@phone.Image" style="width:50%; height:80px;" alt="smartphone image" />
                     }
                 </td>
                 <td>@phone.Brand.Name</td>

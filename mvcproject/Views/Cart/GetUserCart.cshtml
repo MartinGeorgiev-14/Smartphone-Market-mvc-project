@@ -14,7 +14,7 @@
         <table class="table table-striped">
             <tr>
                 <th>Product</th>
-                <th>Model</th>
+                <th>Image</th>
                 <th>Unit Price(INR)</th>
                 <th>Total Price</th>
                 <th>Action</th>
@@ -26,11 +26,11 @@
                     <td>
                         @if (string.IsNullOrEmpty(item.Smartphone.Image))
                         {
-                            <img src="/images/NoImage.png" style="width:80px;height:100px" />
+                            <img src="/images/NoImage.png" style="width:50%;height:80px" />
                         }
                         else
                         {
-                            <img src="/images/@item.Smartphone.Image" style="width:80px;height:100px" />
+                            <img src="/images/@item.Smartphone.Image" style="width:50%;height:80px" />
                         }
                     </td>
                     <td>@item.Smartphone.Price X @item.Quantity</td>
