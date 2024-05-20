@@ -1,1 +1,1 @@
-# mvcproject
+An ASP.NET Core MVC application for selling smartphones. Users can add and remove smartphones from the cart and view purchase history. Also can filter smartphones by Brand and search by model. Administrators can edit add or remove new Stock, Brands, Products and orders.
