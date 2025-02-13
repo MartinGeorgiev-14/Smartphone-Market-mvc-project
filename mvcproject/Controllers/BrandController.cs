@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mvcproject.Repositories.Interfaces;
+using mvcproject.Services.IService;
 using SM.Data.Models.DTOs;
 using SM.Data.Models.Models;
 using System.Linq.Expressions;
@@ -11,16 +12,16 @@ namespace mvcproject.Controllers
 
     public class BrandController : Controller
     {
-        private readonly IBrandRepository _brandRepo;
+        private readonly IBrandService _brandService;
 
-        public BrandController(IBrandRepository brandRepo)
+        public BrandController(IBrandService brandService)
         {
-            this._brandRepo = brandRepo;
+            this._brandService = brandService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var brands = await _brandRepo.GetBrands();
+            var brands = await _brandService.Index();
             return View(brands);
         }
 
@@ -36,14 +37,15 @@ namespace mvcproject.Controllers
             {
                 return View(brand);
             }
-            try
+           
+            bool isAdded = await _brandService.AddBrand(brand);
+
+            if (isAdded)
             {
-                var brandToAdd = new Brand { Name = brand.BrandName, Id = brand.Id };
-                await _brandRepo.AddBrand(brandToAdd);
-                TempData["successMessage"] = "Brad added successfully";
+                TempData["successMessage"] = "Brand added successfully";
                 return RedirectToAction(nameof(AddBrand));
             }
-            catch (Exception ex)
+            else
             {
                 TempData["errorMessage"] = "Brand could not be added";
                 return View(brand);
@@ -52,48 +54,30 @@ namespace mvcproject.Controllers
 
         public async Task<IActionResult> UpdateBrand(Guid id)
         {
-            var brand = await _brandRepo.GetBrandById(id);
-            if (brand is null)
-                throw new InvalidOperationException($"Genre with id: {id} does not found");
-            var genreToUpdate = new BrandDTO
-            {
-                Id = brand.Id,
-                BrandName = brand.Name
-            };
+            var genreToUpdate = await _brandService.UpdateBrand(id);
+           
             return View(genreToUpdate);
         }
 
         [HttpPost]
-
         public async Task<IActionResult> UpdateBrand(BrandDTO brandToUpdate)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(brandToUpdate);
-            }
-            try
-            {
-                var brand = new Brand { Name = brandToUpdate.BrandName, Id = brandToUpdate.Id }; 
-                await _brandRepo.UpdateBrand(brand);
-                TempData["successMessasge"] = "Brand is updated successfully";
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = "Brand is could not be updated";
-                return View(brandToUpdate);
-            }
+                await _brandService.UpdateBrandPost(brandToUpdate);
+                return RedirectToAction(nameof(Index));    
         }
 
         public async Task<IActionResult> DeleteBrand(Guid id)
         {
-            var brand = await _brandRepo.GetBrandById(id);
-            if(brand is null)
+            bool IsDeleted = await _brandService.DeleteBrand(id);
+
+            if (IsDeleted)
             {
+                return RedirectToAction(nameof(Index));
+            }
+            else {
                 throw new InvalidOperationException($"Brand with id: {id} was not found");
             }
-            await _brandRepo.DeleteBrand(brand);
-            return RedirectToAction(nameof(Index));
+            
         }
     }
 }

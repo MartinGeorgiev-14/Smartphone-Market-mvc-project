@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mvcproject.Repositories.Interfaces;
+using mvcproject.Services.IService;
 using SM.Data.Models.DTOs;
 
 namespace mvcproject.Controllers
@@ -10,17 +11,17 @@ namespace mvcproject.Controllers
 
     public class CartController : Controller
     {
-        ICartRepository _cartRepo;
+        ICartService _cartService;
 
-        public CartController(ICartRepository cartRepo)
+        public CartController(ICartService cartService)
         {
-            this._cartRepo = cartRepo;
+            this._cartService = cartService;
         }
 
 
         public async Task<IActionResult> AddItem(Guid phoneId, int quantity = 1, int redirect = 0)
         {
-            var cartCount = await _cartRepo.AddItem(phoneId, quantity);
+            var cartCount = await _cartService.AddItem(phoneId, quantity);
             if(redirect == 0)
             {
                 return Ok(cartCount);
@@ -29,26 +30,23 @@ namespace mvcproject.Controllers
             {
                 return RedirectToAction("GetUserCart");
             }
-
-            
         }
 
         public async Task<IActionResult> RemoveItem(Guid phoneId)
         {
-            var cartCount = await _cartRepo.RemoveItem(phoneId);
-
+            await _cartService.RemoveItem(phoneId);
             return RedirectToAction("GetUserCart");
         }
 
         public async Task<IActionResult> GetUserCart()
         {
-            var cart = await _cartRepo.GetUserCart();
+            var cart = await _cartService.GetUserCart();
             return View(cart);
         }
 
         public async Task<IActionResult> GetTotalItemInCart()
         {
-            int cartItem = await _cartRepo.GetCartItemCount();
+            int cartItem = await _cartService.GetTotalItemCount();
             return Ok(cartItem);
         }
 
@@ -60,12 +58,8 @@ namespace mvcproject.Controllers
         [HttpPost]
         public async Task<IActionResult> Checkout(CheckoutModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            bool isCheckedOut = await _cartRepo.DoCheckout(model);
+       
+            bool isCheckedOut = await _cartService.DoCheckout(model);
             if (!isCheckedOut)
             {
                 return RedirectToAction(nameof(OrderFail));

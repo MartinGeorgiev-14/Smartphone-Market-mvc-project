@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mvcproject.Repositories.Interfaces;
+using mvcproject.Services.IService;
 using SM.Data.Models.DTOs;
 
 namespace mvcproject.Controllers
@@ -8,51 +9,33 @@ namespace mvcproject.Controllers
     [Authorize(Roles = "Admin")]
     public class StockController : Controller
     {
-        private readonly IStockRepostiory _stockRepo;
+        private readonly IStockService _stockService;
 
-        public StockController(IStockRepostiory stockRepo)
+        public StockController(IStockService stockService)
         {
-            this._stockRepo = stockRepo;
+            this._stockService = stockService;
         }
-
+        // Retunrs stock page
         public async Task<IActionResult> Index(string sTerm = "")
         {
-            var stocks = await _stockRepo.GetStocks(sTerm);
+            var stocks = await _stockService.Index(sTerm);
 
             return View(stocks);
         }
 
+        // returns manage stock page
         public async Task<IActionResult> ManageStock(Guid phoneId)
         {
-            var existingStock = await _stockRepo.GetStockBySmartphoneId(phoneId);
+            var stock = await _stockService.ManageStock(phoneId);
 
-            var stock = new StockDTO
-            {
-                SmartphoneId = phoneId,
-                Quantity = existingStock != null ? existingStock.Quantity : 0,
-            };
             return View(stock);
         }
 
+        // changes stock quantity of a smartphone
         [HttpPost]
         public async Task<IActionResult> ManageStock(StockDTO stock)
-        {
-            if(!ModelState.IsValid) 
-            {
-                return View(stock);
-                
-            }
-
-            try
-            {
-                await _stockRepo.ManageStock(stock);
-                TempData["successMessage"] = "Stock has been updated successfully";
-            }
-            catch (Exception ex) 
-            {
-                TempData["errorMessage"] = "Something went wrong";
-            }
-
+        {          
+            await _stockService.ManageStockPost(stock);
             return RedirectToAction(nameof(Index));
         }
     }

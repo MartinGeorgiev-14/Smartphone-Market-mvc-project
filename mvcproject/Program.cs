@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using mvcproject.Repositories;
 using mvcproject.Repositories.Interfaces;
+using mvcproject.Services;
+using mvcproject.Services.IService;
 using mvcproject.Shared;
 using SM.Common;
 using SM.Data;
@@ -22,12 +24,18 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.Sign
     .AddDefaultTokenProviders();
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddTransient<IHomeService, HomeService>();
 builder.Services.AddTransient<IHomeRepository, HomeRepository>();
+builder.Services.AddTransient<ICartService, CartService>();
 builder.Services.AddTransient<ICartRepository, CartRepository>();
+builder.Services.AddTransient<IUserOrderService, UserOrderService>();
 builder.Services.AddTransient<IUserOrderRepository, UserOrderRepository>();
+builder.Services.AddTransient<IStockService, StockService>();
 builder.Services.AddTransient<IStockRepostiory, StockRepostiory>();
+builder.Services.AddTransient<IBrandService, BrandService>();
 builder.Services.AddTransient<IBrandRepository, BrandRepository>();
 builder.Services.AddTransient<IFileService, FileService>();
+builder.Services.AddTransient<ISmartphoneService, SmartphoneService>();
 builder.Services.AddTransient<ISmartphoneRepository, SmartphoneRepository>();
 
 var app = builder.Build();

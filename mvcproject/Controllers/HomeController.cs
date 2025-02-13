@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using mvcproject.Models;
 using mvcproject.Repositories.Interfaces;
+using mvcproject.Services.IService;
 using SM.Data.Models.DTOs;
 using SM.Data.Models.Models;
 using System.Diagnostics;
@@ -9,28 +10,17 @@ namespace mvcproject.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly IHomeRepository _homeRepository;
 
-        public HomeController(ILogger<HomeController> logger, IHomeRepository homeRepository)
+        private readonly IHomeService _homeService;
+
+        public HomeController(IHomeService homeService)
         {
-            this._logger = logger;
-            this._homeRepository = homeRepository;
+            this._homeService = homeService;
         }
 
         public async Task<IActionResult> Index(Guid brandId, string sterm = "")
         {
-
-            IEnumerable<Smartphone> phones = await _homeRepository.GetPhones(brandId, sterm);
-            IEnumerable<Brand> brands = await _homeRepository.Brands();
-            DisplayPhone phoneModel = new DisplayPhone 
-            {
-                Smartphones = phones,
-                Brands = brands,
-                STerm = sterm,
-                BrandId = brandId
-            };
-
+            var phoneModel = await _homeService.Index(brandId, sterm);
             return View(phoneModel);
         }
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using mvcproject.Repositories.Interfaces;
+using mvcproject.Services.IService;
 using mvcproject.Shared;
 using SM.Data.Models.DTOs;
 using SM.Data.Models.Models;
@@ -13,217 +14,99 @@ namespace mvcproject.Controllers
 
     public class SmartphoneController : Controller
     {
-        private readonly ISmartphoneRepository _smartphoneRepo;
-        private readonly IBrandRepository _brandRepo;
-        private readonly IFileService _fileService;
 
-        public SmartphoneController(ISmartphoneRepository smartphoneRepo, IBrandRepository brandRepo, IFileService fileService)
+        private readonly IFileService _fileService;
+        private readonly ISmartphoneService _smartphoneService;
+
+        public SmartphoneController(IFileService fileService, ISmartphoneService smartphoneService)
         {
-            this._smartphoneRepo = smartphoneRepo;
-            this._brandRepo = brandRepo;
             this._fileService = fileService;
+            this._smartphoneService = smartphoneService;
         }
 
+        //Returns Smartphones page
         public async Task<IActionResult> Index()
         {
-            var phones = await _smartphoneRepo.GetSmartphones();
+            var phones = await _smartphoneService.Index();
             return View(phones);
         }
 
+        //Returns Add more smartphones page
         public async Task<IActionResult> AddSmartphone()
         {
-            var brandSelectList = (await _brandRepo.GetBrands()).Select(brand => new SelectListItem
-            {
-                Text = brand.Name,
-                Value = brand.Id.ToString(),
-            });
-            SmartphoneDTO brandToAdd = new() { BrandList = brandSelectList };
+            SmartphoneDTO brandToAdd = await _smartphoneService.AddSmartphone();
             return View(brandToAdd);
         }
 
+        //Adds a new smartphone to db
         [HttpPost]
         public async Task<IActionResult> AddSmartphone(SmartphoneDTO phoneToAdd)
         {
-            var brandSelectList = (await _brandRepo.GetBrands()).Select(brand => new SelectListItem
-            {
-                Text = brand.Name,
-                Value = brand.Id.ToString(),
-            });
-            phoneToAdd.BrandList = brandSelectList;
-
             if (!ModelState.IsValid)
             {
                 return View(phoneToAdd);
             }
-                
 
-            try
+            var result = await _smartphoneService.AddSmartphoneAsync(phoneToAdd);
+
+            if (result)
             {
-                if (phoneToAdd.ImageFile != null)
-                {
-                    if (phoneToAdd.ImageFile.Length > 1 * 1024 * 1024)
-                    {
-                        throw new InvalidOperationException("Image file can not exceed 1 MB");
-                    }
-                    string[] allowedExtensions = [".jpeg", ".jpg", ".png"];
-                    string imageName = await _fileService.SaveFile(phoneToAdd.ImageFile, allowedExtensions);
-                    phoneToAdd.Image = imageName;
-                }
-               
-                Smartphone smartphone = new()
-                {
-                    Id = phoneToAdd.Id,
-                    Name = phoneToAdd.SmartphoneName,
-                    Image = phoneToAdd.Image,
-                    BrandId = phoneToAdd.BrandId,
-                    Price = phoneToAdd.Price,
-                    ShortDescription = phoneToAdd.ShortDescription,
-                    LongDescription = phoneToAdd.LongDescription,
-                };
-                await _smartphoneRepo.AddSmartphone(smartphone);
-                TempData["successMessage"] = "Smartphone is added successfully";
+                TempData["successMessage"] = "Smartphone has been added succesfuly";
                 return RedirectToAction(nameof(AddSmartphone));
             }
-            catch (InvalidOperationException ex)
+            else
             {
-                TempData["errorMessage"] = ex.Message;
-                return View(phoneToAdd);
-            }
-            catch (FileNotFoundException ex)
-            {
-                TempData["errorMessage"] = ex.Message;
-                return View(phoneToAdd);
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = "Error on saving data";
+                TempData["errorMessage"] = "Error adding smartphone";
                 return View(phoneToAdd);
             }
         }
 
+        //Returns Edit smartphone page with a certain smartphone
         public async Task<IActionResult> UpdateSmartphone(Guid id)
         {
-            var phone = await _smartphoneRepo.GetSmartphoneById(id);
+            var phone = await _smartphoneService.GetSmartphoneById(id);
             if (phone == null)
             {
                 TempData["errorMessage"] = $"Smartphone with the id: {id} does not found";
                 return RedirectToAction(nameof(Index));
             }
-            var brandSelectList = (await _brandRepo.GetBrands()).Select(brand => new SelectListItem
-            {
-                Text = brand.Name,
-                Value = brand.Id.ToString(),
-                Selected = brand.Id == phone.BrandId
-            });
-            SmartphoneDTO smartphoneToUpdate = new()
-            {
-                BrandList = brandSelectList,
-                SmartphoneName = phone.Name,
-                BrandId = phone.BrandId,
-                Price = phone.Price,
-                Image = phone.Image,
-                ShortDescription = phone.ShortDescription,
-                LongDescription = phone.LongDescription,
-            };
+            SmartphoneDTO smartphoneToUpdate = await _smartphoneService.UpdateSmartphone(phone);
             return View(smartphoneToUpdate);
         }
 
+        //Edits a certain smartphone
         [HttpPost]
         public async Task<IActionResult> UpdateSmartphone(SmartphoneDTO phoneToUpdate)
         {
-            var brandSelectList = (await _brandRepo.GetBrands()).Select(brand => new SelectListItem
-            {
-                Text = brand.Name,
-                Value = brand.Id.ToString(),
-                Selected = brand.Id == phoneToUpdate.BrandId
-            });
-            phoneToUpdate.BrandList = brandSelectList;
-
             if (!ModelState.IsValid)
-                return View(phoneToUpdate);
-
-            try
             {
-                string oldImage = "";
-                if (phoneToUpdate.ImageFile != null)
-                {
-                    if (phoneToUpdate.ImageFile.Length > 1 * 1024 * 1024)
-                    {
-                        throw new InvalidOperationException("Image file can not exceed 1 MB");
-                    }
-                    string[] allowedExtensions = [".jpeg", ".jpg", ".png"];
-                    string imageName = await _fileService.SaveFile(phoneToUpdate.ImageFile, allowedExtensions);
-                    // hold the old image name. Because we will delete this image after updating the new
-                    oldImage = phoneToUpdate.Image;
-                    phoneToUpdate.Image = imageName;
-                }
-     
-                Smartphone smartphone = new()
-                {
-                    Id = phoneToUpdate.Id,
-                    Name = phoneToUpdate.SmartphoneName,
-                    BrandId = phoneToUpdate.BrandId,
-                    Price = phoneToUpdate.Price,
-                    Image = phoneToUpdate.Image,
-                    ShortDescription = phoneToUpdate.ShortDescription,
-                    LongDescription = phoneToUpdate.LongDescription,
-                };
-                await _smartphoneRepo.UpdateSmartphone(smartphone);
-                // if image is updated, then delete it from the folder too
-                if (!string.IsNullOrWhiteSpace(oldImage))
-                {
-                    _fileService.DeleteFile(oldImage);
-                }
-                TempData["successMessage"] = "Smartphone is updated successfully";
+                return View(phoneToUpdate);
+            }
+
+            var result = await _smartphoneService.UpdateSmartphoneAsync(phoneToUpdate);
+
+            if (result)
+            {
+                TempData["successMessage"] = "Smartphone has been updated succesfuly";
                 return RedirectToAction(nameof(Index));
             }
-            catch (InvalidOperationException ex)
+            else
             {
-                TempData["errorMessage"] = ex.Message;
-                return View(phoneToUpdate);
-            }
-            catch (FileNotFoundException ex)
-            {
-                TempData["errorMessage"] = ex.Message;
-                return View(phoneToUpdate);
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = "Error on saving data";
+                TempData["errorMessage"] = "Error updating smartphone";
                 return View(phoneToUpdate);
             }
         }
 
+        //Deletes a certain smartphone from db
         public async Task<IActionResult> DeleteSmartphone(Guid id)
         {
-            try
-            {
-                var phone = await _smartphoneRepo.GetSmartphoneById(id);
-                if (phone == null)
+            var isDeleted = await _smartphoneService.DeleteSmartphone(id);
+
+                if (!isDeleted)
                 {
-                    TempData["errorMessage"] = $"Smartphone with the id: {id} does not found";
+                    TempData["errorMessage"] = $"Smartphone with the id: {id} was not found";
                 }
-                else
-                {
-                    await _smartphoneRepo.DeleteSmartphone(phone);
-                    if (!string.IsNullOrWhiteSpace(phone.Image))
-                    {
-                        _fileService.DeleteFile(phone.Image);
-                    }
-                }
-            }
-            catch (InvalidOperationException ex)
-            {
-                TempData["errorMessage"] = ex.Message;
-            }
-            catch (FileNotFoundException ex)
-            {
-                TempData["errorMessage"] = ex.Message;
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = "Error on deleting the data";
-            }
+
             return RedirectToAction(nameof(Index));
         }
     }
